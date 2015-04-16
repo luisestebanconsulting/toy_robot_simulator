@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+#
+#   robot_simulator   - Toy Robot Simulator Launch File
+#
+#     Luis Esteban    16 April 2015
+#       Created
+#
+
+begin
+  require 'robot_simulator'
+rescue LoadError
+  $:.unshift(File.expand_path(File.join(File.dirname(__FILE__),'..','lib')))
+  require 'robot_simulator'
+end
+
+Simulator.new ARGV
