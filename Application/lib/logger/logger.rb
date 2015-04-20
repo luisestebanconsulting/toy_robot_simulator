@@ -20,6 +20,11 @@ class Logger
   
   def puts(*args)
     @log_file && @log_file.puts(*args)
+    self.flush
+  end
+  
+  def flush
+    @log_file && @log_file.flush
   end
   
   def close

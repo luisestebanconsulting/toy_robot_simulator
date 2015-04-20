@@ -22,4 +22,24 @@ describe Robot do
     end
   end
   
+  describe "Following commands" do
+    it "ignores unplaced movements" do
+      assert_output("") do
+        @robot.move
+        @robot.report
+      end
+    end
+    
+    it "obeys placed movements" do
+      assert_output("4,1,EAST\n") do
+        table = Table.new
+        table.place(@robot, [4,2])
+        @robot.place(:south)
+        @robot.move
+        @robot.left
+        @robot.report
+      end
+    end
+  end
+  
 end

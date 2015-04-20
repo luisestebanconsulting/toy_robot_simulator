@@ -31,7 +31,6 @@ describe Logger do
   describe "Basic logging" do
     it "Outputs logging messages" do
       @logger.puts("Log message")
-      @logger.close
       File.read(LOG_FILE).must_equal "Log message\n"
     end
   end

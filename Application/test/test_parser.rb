@@ -11,6 +11,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)),'..','lib','robot_sim
 
 PARSER_INPUT = 'test_input.txt'
 
+
 class Dummy
   
   # The Dummy class simply outputs what messages have been sent to it.
@@ -20,6 +21,7 @@ class Dummy
   end
   
 end
+
 
 describe Parser do
   

@@ -9,16 +9,34 @@
 require 'minitest/autorun'
 require File.join(File.expand_path(File.dirname(__FILE__)),'..','lib','robot_simulator')
 
+TEST_INPUT = 'test_simulator_input.txt'
 
 describe Simulator do
   
-  before do
-    @simulator = Simulator.new
+  describe "Simple command file input processing" do
+    it "Processes a simple command file" do
+      File.open(TEST_INPUT,'w') do |file|
+        file.puts <<EOF
+MOVE
+REPORT
+PLACE 1,2,EAST
+MOVE
+LEFT
+MOVE
+REPORT
+EOF
+      end
+      out,err = capture_io do
+        @simulator = Simulator.new [TEST_INPUT]
+      end
+      out.must_equal "2,3,NORTH\n"
+      err.must_equal ""
+    end
   end
-
-  describe "#inspect" do
-    it "returns debug info of the simulator" do
-      @simulator.inspect.must_match /^#<Simulator:0x/
+  
+  after do
+    if File.exist?(TEST_INPUT)
+      File.delete(TEST_INPUT)
     end
   end
   
