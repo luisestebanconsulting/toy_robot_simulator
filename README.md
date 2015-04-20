@@ -106,7 +106,7 @@ C:> robot_simulator.bat [-h] [cmdfile]
 
 Commands are issued to the simulator according to the following railroad diagram.
 
-![Syntax Diagram](../Design/CommandLanguageSyntax.png)
+![Syntax Diagram](./Design/CommandLanguageSyntax.png)
 
 Note, the `QUIT` command is available in interactive mode only.
 
