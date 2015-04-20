@@ -1,12 +1,21 @@
 # Toy Robot Simulator
 
-## Description
+## Description from Client Brief
 
 * The application is a simulation of a toy robot moving on a square tabletop, of dimensions 5 units x 5 units.
 * There are no other obstructions on the table surface.
 * The robot is free to roam around the surface of the table, but must be prevented from falling to
 destruction. Any movement that would result in the robot falling from the table must be prevented,
 however further valid movement commands must still be allowed.
+* Create an application that can read in commands of the following form:
+```
+PLACE X,Y,F
+MOVE
+LEFT
+RIGHT
+REPORT
+```
+
 
 ## Analysis and Design Decisions
 
@@ -16,8 +25,9 @@ however further valid movement commands must still be allowed.
 * Entity / Robot
 * Entity / Container / Environment / Table
 * Logger
+* Parser
 
-!(Class Diagram)[https://github.com/luisestebanconsulting/toy_robot_simulator/Design/ClassDiagram.png]
+![Class Diagram](../Design/ClassDiagram.png)
 
 #### Simulator
 
@@ -68,3 +78,13 @@ A Table is an Environment where a Robot can be placed and move around.
 Verbs:
 
 * Does the table exist at this location?
+
+##### Parser
+
+A Parser reads from a file or pipe and parses the stream into messages (i.e. method calls to a target object).
+
+Verbs:
+
+* Start parsing
+
+

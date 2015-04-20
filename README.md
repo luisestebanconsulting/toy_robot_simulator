@@ -28,7 +28,7 @@ even contribute to the project.
 ### Using Git
 
 To download using Git, you will need to have Git installed.
-If you do not have Git, go to the (Git download page)[http://git-scm.com/downloads].
+If you do not have Git, go to the [Git download page](http://git-scm.com/downloads).
 
 Then download using the Git clone command.
 ```Bash
@@ -103,6 +103,19 @@ $ cd test
 $ ruby test_robot.rb
 ```
 
+
+## History
+
+Most recent work was:
+
+* Filling in basic logging facilities
+* Adding a command line parser, which can read from a file or interactively
+
+```
+* a671371 2015-04-16 | Empty infrastructure (Simulator, Entity/Robot. Entity/Container/Environment/Table, Logger) from initial client brief (see Documentation
+/Requirements.md) (HEAD, tag: v0.0, origin/master, origin/HEAD, master) [Luis Esteban]
+* 70acc71 2015-04-16 | Initial commit [Luis Esteban]
+```
 
 ## Contributing
 
