@@ -34,6 +34,22 @@ EOF
     end
   end
   
+  before do
+    system("ruby ./programs/gen_test_progs.rb")
+  end
+  
+  describe "Generated command file testing" do
+    Dir["programs/test_prog_*"].sort.each do |filename|
+      it "reads test program #{filename.inspect}" do
+        out,err = capture_io do
+          @simulator = Simulator.new [filename]
+        end
+        out.must_equal File.read(filename.sub(/test_prog_/,'test_rept_'))
+        err.must_equal ""
+      end
+    end
+  end
+  
   after do
     if File.exist?(TEST_INPUT)
       File.delete(TEST_INPUT)

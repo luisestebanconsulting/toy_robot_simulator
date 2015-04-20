@@ -44,7 +44,6 @@ private
       else
         if argv[0] == '-h'
           $stderr.puts "Usage: #{File.basename($0)} [-h] [cmdfile]"
-          exit
         else
           @input = argv[0]
           unless File.exist?(@input)
@@ -56,8 +55,9 @@ private
   end
   
   def place(x,y,f)
-    location = [x,y]
-    @table.place(@robot, location)
+    return unless @table.exists_at?(x,y)
+    
+    @table.place(@robot, [x,y])
     @robot.place(f)
   end
   
@@ -84,6 +84,7 @@ private
   def help_commands(line)
     puts "Unknown command: #{line.inspect}"
     puts <<-EOF
+
       Valid commands are:
         PLACE x,y,f
         MOVE

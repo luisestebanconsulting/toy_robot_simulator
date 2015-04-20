@@ -22,16 +22,15 @@ class Robot < Entity
   end
   
   def place(f)
+    return unless DIRECTIONS.include?(f)
+    
     @facing = f
   end
   
   def move(distance = 1)
-    current_location = self.location
+    return unless valid?
     
-    return unless current_location
-    return unless DIRECTIONS.include?(@facing)
-    
-    destination = current_location.add(
+    destination = self.location.add(
       MOVES[@facing].scale(distance)
     )
     
@@ -49,11 +48,9 @@ class Robot < Entity
   end
   
   def report
-    current_location = self.location
+    return unless valid?
     
-    return unless current_location
-    
-    puts "%d,%d,%s" % [*current_location,@facing.to_s.upcase]
+    puts "%d,%d,%s" % [*self.location,@facing.to_s.upcase]
   end
 
 private
@@ -64,6 +61,10 @@ private
     @facing = DIRECTIONS[
       (DIRECTIONS.index(@facing) + n) % DIRECTIONS.size
     ]
+  end
+  
+  def valid?
+    self.location and DIRECTIONS.include?(@facing)
   end
   
 end
