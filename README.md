@@ -137,11 +137,13 @@ A number of systematically generated test programs (i.e. robot command files) ar
 
 Most recent work was:
 
-* Systematic testing of the simulation (in particular testing for the robot falling off the table and moving correctly)
-* Correct bugs with placing and facing of the robot
+* Allow tables to be different sizes (in library only)
 
 
 ```
+* 6771994 2015-04-20 | Fixed link to syntax diagram in README.md (HEAD, origin/master, origin/HEAD, master) [Luis Esteban]
+* 47c4b61 2015-04-20 | Created systematic tests, in particular for invalid commands and movements; also fixed bugs revealed from systematic testing (tag: v1.0
+) [Luis Esteban]
 * de2c242 2015-04-20 | Completed remaining empty classes (see Documentation/Requirements.md): Completed definitions of Entity classes (Entity, Container, Envi
 ronment), of Robot and Table, and of the Simulator. (HEAD, origin/master, origin/HEAD, master) [Luis Esteban]
 * 8af7281 2015-04-20 | Basic Logging and Basic Parsing (see Documentation/Requirements.md): Created Parser class, filled in basic functions of Logger class. (

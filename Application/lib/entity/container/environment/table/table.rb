@@ -12,8 +12,12 @@ class Table < Environment
   
   def initialize(options = {})
     super
-    @x_dimension ||= 0...DEFAULT_SIZE
-    @y_dimension ||= 0...DEFAULT_SIZE
+    
+    @size ||= options[:size] || DEFAULT_SIZE
+    @size   = 0   if @size < 0
+    
+    @x_dimension ||= 0...@size
+    @y_dimension ||= 0...@size
   end
   
   def exists_at?(x,y)

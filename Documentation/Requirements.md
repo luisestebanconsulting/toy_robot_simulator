@@ -174,10 +174,15 @@ Verbs:
 
 A Container is an Entity that can contain other Entities.
 
+Attributes:
+
+* Contents
+
 Verbs:
 
 * Add
 * Remove
+* Do I contain entity x?
 
 ##### Environment
 
@@ -190,6 +195,13 @@ Verbs:
 ##### Table
 
 A Table is an Environment where a Robot can be placed and move around.
+
+Attributes:
+
+* Size
+
+Since constants are often changed, the size of the table may be.
+Only the class library allows this.  The simulation still runs with a table of size 5 (as according to the brief).
 
 Verbs:
 
