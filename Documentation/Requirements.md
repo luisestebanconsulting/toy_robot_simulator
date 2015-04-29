@@ -201,6 +201,9 @@ Attributes:
 * Size
 
 Since constants are often changed, the size of the table may be.
+Also, it may be coincidence that the dimensions are both the same.  The client/users
+may request rectangular tables.
+
 Only the class library allows this.  The simulation still runs with a table of size 5 (as according to the brief).
 
 Verbs:

@@ -51,7 +51,10 @@ The Toy Robot Simulator project does not require any system installation to run.
 
 If you are planning to use the library for other projects, you can manually install
 the library into your project.  In the future, this project will be available as a gem,
-so that you can simply `require 'robot_simulator'`.
+so that you can simply do:
+```Ruby
+require 'robot_simulator'
+```
 
 ## Usage
 
@@ -139,16 +142,17 @@ require 'robot_simulator'
 ```
 
 The following classes are available:
+
 ![Class Hierarchy Diagram](./Design/ClassDiagram.png)
 
 * *Simulator*: creates the objects and runs the simulation
 * *Logger*: logs messages for debugging
 * *Parser*: a generic command line parser
-* *Entity*: xxx
-** *Container*: xxx
-*** *Environment*: xxx
-**** *Table*: xxx
-** *Robot*: xxx
+* *Entity*: an object to be simulated
+ * *Container*: an entity which contains entities
+  * *Environment*: an entity which contains entities at specific locations
+   * *Table*: an entity which contains entities at specific bounded locations
+ * *Robot*: an entity which moves on a table
 
 #### Simulator
 
@@ -189,26 +193,26 @@ A Parser reads lines of text from a file or stream, such as $stdin, and translat
 the lines into object oriented messages to a target object.  A Parser is initialised
 with a Hash of options.
 
-*  :input          - The file to parse (could be stdin)
-*  :prompt         - The prompt to use if stdin is interactive
-*  :errors         - Errors are sent to this stream if not nil
-*  :rules          - A Hash of RegExps and conversions (see below)
-*  :target         - The object to which messages from matching rules are sent
-*  :stop_on_error  - A Boolean indicating to stop parsing when a rule is not matched
-*  :default        - An action for unmatched input
-*  :start          - A Boolean indicating to start parsing immediately on creation
+*  `:input`          - The file to parse (could be stdin)
+*  `:prompt`         - The prompt to use if stdin is interactive
+*  `:errors`         - Errors are sent to this stream if not nil
+*  `:rules`          - A Hash of RegExps and conversions (see below)
+*  `:target`         - The object to which messages from matching rules are sent
+*  `:stop_on_error`  - A Boolean indicating to stop parsing when a rule is not matched
+*  `:default`        - An action for unmatched input
+*  `:start`          - A Boolean indicating to start parsing immediately on creation
 
 
 The options have the following defaults:
 
-* input:          STDIN               Default to input coming from stdin
-* prompt:         '> '                If input is stdin and not piped, this is the prompt
-* errors:         nil                 Errors are not output
-* rules:          { /.*/ => true }    Which means everyline is matched and thus sent to the target as a method
-* target:         self                Really only useful for subclasses with specific methods
-* stop_on_error:  false               Do not stop on errors (i.e. when no rules match input)
-* default:        nil                 No default action
-* start:          nil                 Don't start on creation
+* `input:          STDIN           `    Default to input coming from stdin
+* `prompt:         '> '            `    If input is stdin and not piped, this is the prompt
+* `errors:         nil             `    Errors are not output
+* `rules:          { /.*/ => true }`    Which means everyline is matched and thus sent to the target as a method
+* `target:         self            `    Really only useful for subclasses with specific methods
+* `stop_on_error:  false           `    Do not stop on errors (i.e. when no rules match input)
+* `default:        nil             `    No default action
+* `start:          nil             `    Don't start on creation
 
 If `:input` or `:errors` are strings, then a file is opened for reading input or writing errors.
 
@@ -231,7 +235,7 @@ The remaining elements are the conversions to apply to each argument.
     The argument is converted to a lowercase symbol.
 
   E.g. 3  `/QUIT/  =>  true`
-    The matched string becomes the method, in this case :quit .
+    The matched string becomes the method, in this case `:quit` .
    
 
 
@@ -309,7 +313,7 @@ environment.place(an_entity, :entrance)   # Named locations can also be used.  T
 
 #### Table
 
-A Table creates a flat square limited environment.  The default size is 5 units x 5 units.
+A Table creates a flat rectangular limited environment.  The default size is 5 units x 5 units.
 
 ```Ruby
 table = Table.new
@@ -322,6 +326,24 @@ table = Table.new size: rand(2..20)
 Creates a table of random size between 2 to 20; thus squares from:
 * (0,0) to (1,1), to
 * (0,0) to (19,19)
+
+```Ruby
+table = Table.new size: '4'
+
+```
+Creates a square table 4 units x 4 units.
+
+```Ruby
+table = Table.new size: '(3,8)'
+table = Table.new size: '[3,8]'
+table = Table.new size: ' 3,8 '
+table = Table.new size: ' 3*8 '
+table = Table.new size: ' 3x8 '
+table = Table.new size: ' 3 8 '
+
+```
+All create a rectangular table 3 units x 8 units.  This allows table size to be provided
+as an option in ARGV and be processed properly by the Table class.
 
 
 
@@ -388,12 +410,13 @@ Lines containing any positive number of `-` characters separate the input from t
 
 Most recent work was:
 
-* Allow tables to be different sizes (in library only)
-* Updated README
-* Made instances of entities in a container unique
+* Allowed tables to be rectangular
 
 
 ```
+* 4a34c33 2015-04-29 | Updated README, Made instances of entities in a container unique (HEAD, origin/master, origin/HEAD, master) [Luis Esteban]
+* 5f9ef37 2015-04-25 | Allowed tables to be different sizes (library only) (see Documentation/Requirements.md) (HEAD, origin/master, origin/HEAD, master) [Lui
+s Esteban]
 * 6771994 2015-04-20 | Fixed link to syntax diagram in README.md (HEAD, origin/master, origin/HEAD, master) [Luis Esteban]
 * 47c4b61 2015-04-20 | Created systematic tests, in particular for invalid commands and movements; also fixed bugs revealed from systematic testing (tag: v1.0
 ) [Luis Esteban]
