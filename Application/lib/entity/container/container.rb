@@ -23,6 +23,7 @@ class Container < Entity
   def add(entity)
     entity.container = self
     self.contents << entity
+    self.contents.uniq!
   end
   
   def remove(entity)

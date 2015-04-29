@@ -13,6 +13,7 @@
 #     :rules          - A Hash of RegExps and conversions (see below)
 #     :target         - The object to which messages from matching rules are sent
 #     :stop_on_error  - A Boolean indicating to stop parsing when a rule is not matched
+#     :default        - An action for unmatched input
 #     :start          - A Boolean indicating to start parsing immediately
 #
 #   If :input or :errors are strings, then a file is opened for reading input or writing errors.

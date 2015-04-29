@@ -50,21 +50,40 @@ This project assumes that you have [Ruby](https://www.ruby-lang.org/en/) (>=1.9)
 The Toy Robot Simulator project does not require any system installation to run.
 
 If you are planning to use the library for other projects, you can manually install
-the library into your project.  In the future, this project will be available as a gem.
+the library into your project.  In the future, this project will be available as a gem,
+so that you can simply `require 'robot_simulator'`.
 
 ## Usage
 
-Currently, only the infrastructure exists, so only the empty program can be launched, which does nothing.
+There are two ways to use this project: as a standalone application, and as a library.
 
 
 ### Shell Command Usage
 
 Use the shell of the operating system to change directory to the top level of the project directory.
-Alternatively, you can modify the `PATH` to include the project directory.
+Alternatively, you can modify the `PATH` to include the project directory, such as:
+
+```Bash
+export PATH=$PATH:/home/luis/projects/robot_simulator/Application/bin
+```
 
 If the operating system supports executable files (specifically executable Ruby scripts), then you can launch
-a robot using the command `robot.rb`; otherwise, you will need to launch it with Ruby, `ruby robot.rb`.
-Many default operating system setups do not include the current directory for executable files
+a robot using the command `robot_simulator`; otherwise, you will need to launch it with Ruby, `ruby robot_simulator`.
+Many default operating system setups do not include the current directory in PATH for executable files.  This can
+be remedied in two ways:
+
+* Use a relative path to launch the application,
+* Modify the PATH to include the current directory (on shared computers this could be a security issue).
+
+Use a relative path, such as:
+```Bash
+/home/luis/projects/robot_simulator/Application/bin$ ./robot_simulator -h
+```
+
+Modify the PATH to include the current directory, such as:
+```Bash
+export PATH=$PATH:.
+```
 
 #### Synopsis
 
@@ -111,6 +130,216 @@ Commands are issued to the simulator according to the following railroad diagram
 Note, the `QUIT` command is available in interactive mode only.
 
 
+### Library Usage
+
+To include the entire library,
+
+```Ruby
+require 'robot_simulator'
+```
+
+The following classes are available:
+![Class Hierarchy Diagram](./Design/ClassDiagram.png)
+
+* *Simulator*: creates the objects and runs the simulation
+* *Logger*: logs messages for debugging
+* *Parser*: a generic command line parser
+* *Entity*: xxx
+** *Container*: xxx
+*** *Environment*: xxx
+**** *Table*: xxx
+** *Robot*: xxx
+
+#### Simulator
+
+A Simulator gathers together various objects and sends commands to them.
+The Simulator class in `toy_robot_simulator` is not a generic simulator,
+but rather specifically created for the toy robot simulation.
+
+It expects the command line arguments to be passed to it, but defaults
+will be used if they are omitted.
+
+The defaults are:
+
+* stdin is used for robot command input.
+
+Unless input comes from a pipe, a prompt is issued for each command and errors
+are sent to stderr; otherwise errors are sent to a log file (`robot_simulator.log`).
+
+```Ruby
+simulator = Simulator.new
+simulator = Simulator.new ARGV
+```
+
+#### Logger
+
+A Logger sends log messages to a file or stream, such as $stderr.
+
+```Ruby
+logger = Logger.new
+logger = Logger.new log_to: 'my_log'
+
+logger.puts "my message"      # Send the to message to the log output.
+logger.delete_log             # If the log is a file and exists, it will be deleted.
+```
+
+#### Parser
+
+A Parser reads lines of text from a file or stream, such as $stdin, and translates
+the lines into object oriented messages to a target object.  A Parser is initialised
+with a Hash of options.
+
+*  :input          - The file to parse (could be stdin)
+*  :prompt         - The prompt to use if stdin is interactive
+*  :errors         - Errors are sent to this stream if not nil
+*  :rules          - A Hash of RegExps and conversions (see below)
+*  :target         - The object to which messages from matching rules are sent
+*  :stop_on_error  - A Boolean indicating to stop parsing when a rule is not matched
+*  :default        - An action for unmatched input
+*  :start          - A Boolean indicating to start parsing immediately on creation
+
+
+The options have the following defaults:
+
+* input:          STDIN               Default to input coming from stdin
+* prompt:         '> '                If input is stdin and not piped, this is the prompt
+* errors:         nil                 Errors are not output
+* rules:          { /.*/ => true }    Which means everyline is matched and thus sent to the target as a method
+* target:         self                Really only useful for subclasses with specific methods
+* stop_on_error:  false               Do not stop on errors (i.e. when no rules match input)
+* default:        nil                 No default action
+* start:          nil                 Don't start on creation
+
+If `:input` or `:errors` are strings, then a file is opened for reading input or writing errors.
+
+`:rules` should be a Hash in the form RegExp => action, e.g.:
+```Ruby
+  {
+    /f\((\d+),(\d+)\)/  =>  [:func_f,:to_i,:to_i],
+    /EVENT (.+)/        =>  [:send_event,[:downcase,:to_sym]],
+    /QUIT/              =>  true
+  }
+```
+
+The first element of the action is the method.
+The remaining elements are the conversions to apply to each argument.
+
+  E.g. 1  `/f\((\d+),(\d+)\)/ =>  [:func_f,:to_i,:to_i]`
+    The two arguments are converted to integers.
+
+  E.g. 2  `/EVENT (.+)/ =>  [:send_event,[:downcase,:to_sym]]`
+    The argument is converted to a lowercase symbol.
+
+  E.g. 3  `/QUIT/  =>  true`
+    The matched string becomes the method, in this case :quit .
+   
+
+
+
+```Ruby
+parser = Parser.new
+parser = Parser.new \
+  input:    @input,
+  errors:   @isatty && $stderr || @logger,
+  prompt:   '> ',
+  target:   self,
+  rules:    {
+    /PLACE (\d+),(\d+),([A-Z]+)/    => [:place,:to_i,:to_i,[:downcase,:to_sym]],
+    /MOVE/                          => true,
+    /LEFT/                          => true,
+    /RIGHT/                         => true,
+    /REPORT/                        => true,
+    /QUIT/                          => @isatty,
+  },
+  default:       @isatty && [:help_commands] || nil
+
+parser.start
+parser.stop
+```
+
+#### Entity
+
+An Entity represents a generic object that is to be used in a Simulator.
+For the entity to do anything useful, the Entity class should be used as a
+base class for specific entities.
+
+```Ruby
+entity = Entity.new
+
+entity.container                # Nil or the container it is contained in
+entity.contained?               # Whether the entity is contained in a container or not
+entity.location                 # The location of the entity if it is contained in an environment
+```
+
+#### Container
+
+A Container is an Entity that can contain other Entities.
+
+```Ruby
+container = Container.new
+
+container.contents              # Array of Entities contained in the container
+container.contains?(entity)     # Whether the container containes the specified entity
+container.add(entity)           # Contain the specific entity
+container.remove(entity)        # Uncontain the specific entity
+container.size                  # Number of entities contained in the container
+```
+
+#### Environment
+
+An Environment is a container that adds the notion of location.
+It creates an unbounded area where entities can placed at specific locations.
+Derived classes can limit the available locations.
+
+```Ruby
+environment = Environment.new
+an_entity   = Entity.new
+location    = [3,4]
+
+environment.add(an_entity)                # Places the entity in the environment container, but without a location.
+environment.place(an_entity, location)    # Places the entity in the environment container at the location.
+
+environment.contents                      # Lists the entities in the environment.
+an_entity.location                        # Outputs the location of the entity.
+environment.location_of(an_entity)        # Also outputs the location of the entity.
+environment.exists_at?(location)          # Returns whether the environment exists at the location (i.e. is it a valid location?).
+
+environment.place(an_entity, :entrance)   # Named locations can also be used.  The semantics of locations is not managed by the Environment.
+```
+
+#### Table
+
+A Table creates a flat square limited environment.  The default size is 5 units x 5 units.
+
+```Ruby
+table = Table.new
+```
+Creates a default table.
+
+```Ruby
+table = Table.new size: rand(2..20)
+```
+Creates a table of random size between 2 to 20; thus squares from:
+* (0,0) to (1,1), to
+* (0,0) to (19,19)
+
+
+
+#### Robot
+
+A Robot is a programmable entity that obeys commands.  Currently, the Robots only
+execute commands immediately (i.e. they are not yet programmable).
+
+```Ruby
+robot = Robot.new
+
+robot.place
+robot.report
+robot.move
+robot.left
+robot.right
+```
+
 
 ## Testing
 
@@ -131,13 +360,37 @@ $ ruby test_robot.rb
 A number of systematically generated test programs (i.e. robot command files) are located in
 `Application/test/programs`.  These programs are contained in and generated by
 `Application/test/programs/gen_test_progs.rb`.  This file can be modified to incorporate exhaustive testing.
+Tests can be appended to the file in the format:
 
+```
+========
+PLACE 2,2,NORTH
+MOVE
+LEFT
+MOVE
+REPORT
+--------
+1,3,WEST
+========
+PLACE 2,2,EAST
+MOVE
+LEFT
+MOVE
+REPORT
+--------
+3,3,NORTH
+========
+```
+Lines containing any positive number of `=` characters separate tests.
+Lines containing any positive number of `-` characters separate the input from the output (with the input coming first).
 
 ## History
 
 Most recent work was:
 
 * Allow tables to be different sizes (in library only)
+* Updated README
+* Made instances of entities in a container unique
 
 
 ```
